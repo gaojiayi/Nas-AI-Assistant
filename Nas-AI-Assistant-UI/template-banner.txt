@@ -1,0 +1,9 @@
+<div class="banner">
+        <div class="banner-content">
+          <h1>骨灰级NAS玩家助手</h1>
+          <div class="banner-images">
+            <img src="/images/nas-device.png" alt="NAS设备" class="banner-image nas-image" />
+            <img src="/images/circuit-board.png" alt="电路板" class="banner-image circuit-image" />
+          </div>
+        </div>
+      </div>
