@@ -62,7 +62,7 @@
           v-for="item in menuItems" 
           :key="item.name"
           class="nav-item"
-          :class="{ active: item.name === '主页' }"
+          :class="{ active: item.name === activePage }"
           @click="item.action"
         >
           <div class="nav-icon">
@@ -79,10 +79,13 @@
 import { h, ref } from 'vue'
 
 // 定义emit事件
-const emit = defineEmits(['open-chat', 'open-profile'])
+const emit = defineEmits(['open-chat', 'open-profile', 'page-change'])
 
 // 侧边栏收缩状态
 const isSidebarCollapsed = ref(false)
+
+// 当前激活的页面
+const activePage = ref('主页')
 
 // 切换侧边栏状态
 const toggleSidebar = () => {
@@ -97,21 +100,27 @@ const menuItems = [
       h('path', { d: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z', stroke: 'currentColor', 'stroke-width': 2, fill: 'none' }),
       h('path', { d: 'M9 22V12h6v10', stroke: 'currentColor', 'stroke-width': 2, 'stroke-linecap': 'round' })
     ]),
-    action: () => console.log('主页 clicked')
+    action: () => {
+      activePage.value = '主页'
+      emit('page-change', 'home')
+    }
   },
   {
     name: 'GitHub',
     icon: h('svg', { width: 20, height: 20, viewBox: '0 0 20 20', fill: 'none' }, [
       h('path', { d: 'M10 2C5.58 2 2 5.58 2 10c0 3.86 2.5 7.13 6 8.27v-2.13c-1.73.38-2.13-.85-2.13-.85-.29-.73-.71-1.23-.71-1.23-.58-.4.04-.39.04-.39.64.04.98.66.98.66.58 1 1.52 1.48 2.32 1.48.21-.42.42-.72.61-.88-1.44-.16-2.96-.72-2.96-3.2 0-.71.25-1.29.66-1.74-.07-.16-.29-.82.06-1.71 0 0 .54-.17 1.76.66.51-.14 1.06-.21 1.6-.21.54 0 1.09.07 1.6.21 1.22-.83 1.76-.66 1.76-.66.35.89.13 1.55.06 1.71.41.45.66 1.03.66 1.74 0 2.49-1.52 3.04-2.97 3.19.23.2.44.59.44 1.19v1.76c3.5-1.14 6-4.41 6-8.27 0-4.42-3.58-8-8-8z', stroke: 'currentColor', 'stroke-width': 2 })
     ]),
-    action: () => window.open('https://github.com', '_blank')
+    action: () => window.open('https://github.com/gaojiayi/Nas-AI-Assistant#', '_blank')
   },
   {
-    name: '文档管理',
+    name: '知识库管理',
     icon: h('svg', { width: 20, height: 20, viewBox: '0 0 20 20', fill: 'none' }, [
       h('path', { d: 'M3 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7m-8 0V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4m-8 0h8', stroke: 'currentColor', 'stroke-width': 2 })
     ]),
-    action: () => console.log('文档管理 clicked')
+    action: () => {
+      activePage.value = '知识库管理'
+      emit('page-change', 'knowledge')
+    }
   }
 ]
 </script>
@@ -263,6 +272,7 @@ const menuItems = [
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
+  font-size: 14px;
 }
 
 .nav-item:hover {

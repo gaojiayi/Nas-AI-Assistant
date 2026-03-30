@@ -56,6 +56,11 @@
 
     <!-- 正常内容模式 -->
     <div v-else class="normal-content">
+      <!-- 知识库管理页面 -->
+      <KnowledgeBase v-if="currentPage === 'knowledge'" />
+      
+      <!-- 主页内容 -->
+      <div v-else>
       <div class="banner">
         <div class="banner-content">
           <!-- 如果有合成图片，使用这个 -->
@@ -197,6 +202,7 @@
           </div>
         </div>
       </div>
+      </div>
     </div>
   </div>
 </template>
@@ -205,10 +211,12 @@
 import { ref } from 'vue'
 import CommunityCard from './CommunityCard.vue'
 import FeatureCard from './FeatureCard.vue'
+import KnowledgeBase from './KnowledgeBase.vue'
 
 const props = defineProps({
   showChat: Boolean,
-  showProfile: Boolean
+  showProfile: Boolean,
+  currentPage: String
 })
 
 const emit = defineEmits(['close-chat', 'close-profile'])
@@ -454,7 +462,7 @@ const goToSlide = (index) => {
 .banner {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 20px;
-  padding: 60px 40px;
+  padding: 30px 40px;
   margin-bottom: 48px;
   position: relative;
   overflow: hidden;

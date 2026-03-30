@@ -1,9 +1,10 @@
 <template>
   <div class="app-container">
-    <Sidebar @open-chat="openChat" @open-profile="openProfile" />
+    <Sidebar @open-chat="openChat" @open-profile="openProfile" @page-change="handlePageChange" />
     <MainContent 
       :show-chat="showChat" 
       :show-profile="showProfile" 
+      :current-page="currentPage"
       @close-chat="closeChat" 
       @close-profile="closeProfile" 
     />
@@ -17,6 +18,7 @@ import MainContent from './components/MainContent.vue'
 
 const showChat = ref(false)
 const showProfile = ref(false)
+const currentPage = ref('home')
 
 const openChat = () => {
   showChat.value = !showChat.value
@@ -34,6 +36,10 @@ const closeChat = () => {
 
 const closeProfile = () => {
   showProfile.value = false
+}
+
+const handlePageChange = (page) => {
+  currentPage.value = page
 }
 </script>
 
