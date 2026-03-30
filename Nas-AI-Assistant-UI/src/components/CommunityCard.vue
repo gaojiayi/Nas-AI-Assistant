@@ -1,7 +1,13 @@
 <template>
-  <div class="community-card">
+  <div class="community-card" @click="handlePlay">
     <div class="card-image" :class="imageClass">
       <div class="image-placeholder"></div>
+      <div class="play-button">
+        <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+          <circle cx="30" cy="30" r="28" fill="rgba(255, 255, 255, 0.9)" stroke="rgba(255, 255, 255, 0.3)" stroke-width="2"/>
+          <path d="M24 18l18 12-18 12V18z" fill="#333333"/>
+        </svg>
+      </div>
     </div>
     <div class="card-content">
       <h3>{{ title }}</h3>
@@ -30,6 +36,8 @@ const props = defineProps({
   memberCount: Number
 })
 
+const emit = defineEmits(['play'])
+
 const imageClass = computed(() => `image-${props.image}`)
 
 const formatNumber = (num) => {
@@ -39,6 +47,14 @@ const formatNumber = (num) => {
     return (num / 1000).toFixed(1) + 'K'
   }
   return num.toString()
+}
+
+const handlePlay = () => {
+  emit('play', {
+    title: props.title,
+    description: props.description,
+    image: props.image
+  })
 }
 </script>
 
@@ -67,6 +83,21 @@ const formatNumber = (num) => {
   position: relative;
   overflow: hidden;
   width: 100%;
+}
+
+.play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.9;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.community-card:hover .play-button {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.1);
 }
 
 .image-placeholder {

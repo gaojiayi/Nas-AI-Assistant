@@ -15,7 +15,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <h3>1,234</h3>
+          <h3>{{ statsData.totalDocuments.toLocaleString() }}</h3>
           <p>总文档数</p>
         </div>
       </div>
@@ -27,7 +27,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <h3>2.4GB</h3>
+          <h3>{{ statsData.storageSpace }}</h3>
           <p>存储空间</p>
         </div>
       </div>
@@ -41,7 +41,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <h3>12</h3>
+          <h3>{{ statsData.processing }}</h3>
           <p>处理中</p>
         </div>
       </div>
@@ -55,7 +55,7 @@
           </svg>
         </div>
         <div class="stat-info">
-          <h3>1,222</h3>
+          <h3>{{ statsData.indexed.toLocaleString() }}</h3>
           <p>已索引</p>
         </div>
       </div>
@@ -141,37 +141,14 @@
 
 <script setup>
 import { ref } from 'vue'
+import { uploadedFilesMock, statsDataMock } from '../mock/knowledgeData.js'
 
 const isDragOver = ref(false)
 const fileInput = ref(null)
 const selectedFile = ref(null)
 
-const uploadedFiles = ref([
-  {
-    name: 'NAS配置指南.pdf',
-    size: 2048576,
-    uploadTime: new Date('2024-03-15T10:30:00'),
-    status: 'indexed'
-  },
-  {
-    name: '技术文档.docx',
-    size: 1024000,
-    uploadTime: new Date('2024-03-14T15:20:00'),
-    status: 'indexed'
-  },
-  {
-    name: '数据分析.xlsx',
-    size: 3072000,
-    uploadTime: new Date('2024-03-13T09:15:00'),
-    status: 'processing'
-  },
-  {
-    name: '产品介绍.pptx',
-    size: 5120000,
-    uploadTime: new Date('2024-03-12T14:45:00'),
-    status: 'indexed'
-  }
-])
+const uploadedFiles = ref(uploadedFilesMock)
+const statsData = ref(statsDataMock)
 
 const handleDrop = (e) => {
   e.preventDefault()

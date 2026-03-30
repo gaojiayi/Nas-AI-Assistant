@@ -29,7 +29,7 @@
         </svg>
       </div>
       
-      <div class="user-avatar" @click="emit('open-profile')">
+      <div class="user-avatar">
         <div class="avatar-content">
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
             <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
@@ -37,21 +37,6 @@
             <path d="M8 24c0-4 3-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </div>
-      </div>
-      
-      <div class="chat-button" @click="emit('open-chat')">
-        <div class="chat-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
-      </div>
-      
-      <div class="add-button">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-          <path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
       </div>
     </div>
     
@@ -62,13 +47,33 @@
           v-for="item in menuItems" 
           :key="item.name"
           class="nav-item"
-          :class="{ active: item.name === activePage }"
-          @click="item.action"
+          :class="{ active: (item.route && route.path === item.route) || (item.name === '主页' && route.path === '/community') }"
+          @click="navigate(item)"
         >
           <div class="nav-icon">
             <component :is="item.icon" />
           </div>
           <span v-if="!isSidebarCollapsed">{{ item.name }}</span>
+        </div>
+        
+        <!-- 申明信息 -->
+        <div class="declaration-section">
+          <div class="declaration-item">
+            <div class="declaration-content">
+              <div class="app-name">Nas AI Assistant</div>
+              <div class="version">v1.0.0</div>
+              <div class="made-by">Made by GaoJiaYi</div>
+              <div class="copyright">© 2026</div>
+              <div class="github-link" @click="openGitHub">
+                <div class="github-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <span>GitHub</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -77,52 +82,60 @@
 
 <script setup>
 import { h, ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
-// 定义emit事件
-const emit = defineEmits(['open-chat', 'open-profile', 'page-change'])
+// 使用router和route
+const router = useRouter()
+const route = useRoute()
 
 // 侧边栏收缩状态
 const isSidebarCollapsed = ref(false)
 
-// 当前激活的页面
-const activePage = ref('主页')
-
 // 切换侧边栏状态
 const toggleSidebar = () => {
   isSidebarCollapsed.value = !isSidebarCollapsed.value
-  emit('toggle-sidebar', isSidebarCollapsed.value)
 }
 
 const menuItems = [
   {
-    name: '主页',
-    icon: h('svg', { width: 20, height: 20, viewBox: '0 0 20 20', fill: 'none' }, [
+    name: '体验社区',
+    icon: h('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none' }, [
       h('path', { d: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z', stroke: 'currentColor', 'stroke-width': 2, fill: 'none' }),
       h('path', { d: 'M9 22V12h6v10', stroke: 'currentColor', 'stroke-width': 2, 'stroke-linecap': 'round' })
     ]),
-    action: () => {
-      activePage.value = '主页'
-      emit('page-change', 'home')
-    }
+    route: '/community'
   },
   {
-    name: 'GitHub',
-    icon: h('svg', { width: 20, height: 20, viewBox: '0 0 20 20', fill: 'none' }, [
-      h('path', { d: 'M10 2C5.58 2 2 5.58 2 10c0 3.86 2.5 7.13 6 8.27v-2.13c-1.73.38-2.13-.85-2.13-.85-.29-.73-.71-1.23-.71-1.23-.58-.4.04-.39.04-.39.64.04.98.66.98.66.58 1 1.52 1.48 2.32 1.48.21-.42.42-.72.61-.88-1.44-.16-2.96-.72-2.96-3.2 0-.71.25-1.29.66-1.74-.07-.16-.29-.82.06-1.71 0 0 .54-.17 1.76.66.51-.14 1.06-.21 1.6-.21.54 0 1.09.07 1.6.21 1.22-.83 1.76-.66 1.76-.66.35.89.13 1.55.06 1.71.41.45.66 1.03.66 1.74 0 2.49-1.52 3.04-2.97 3.19.23.2.44.59.44 1.19v1.76c3.5-1.14 6-4.41 6-8.27 0-4.42-3.58-8-8-8z', stroke: 'currentColor', 'stroke-width': 2 })
+    name: 'AI助手',
+    icon: h('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none' }, [
+      h('path', { d: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z', stroke: 'currentColor', 'stroke-width': 2, fill: 'none' }),
+      h('path', { d: 'M8 10h8M8 14h6', stroke: 'currentColor', 'stroke-width': 2, 'stroke-linecap': 'round' })
     ]),
-    action: () => window.open('https://github.com/gaojiayi/Nas-AI-Assistant#', '_blank')
+    route: '/chat'
   },
   {
     name: '知识库管理',
-    icon: h('svg', { width: 20, height: 20, viewBox: '0 0 20 20', fill: 'none' }, [
-      h('path', { d: 'M3 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7m-8 0V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4m-8 0h8', stroke: 'currentColor', 'stroke-width': 2 })
+    icon: h('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none' }, [
+      h('rect', { x: '2', y: '8', width: '5', height: '7', stroke: 'currentColor', 'stroke-width': 2 }),
+      h('rect', { x: '9.5', y: '8', width: '5', height: '7', stroke: 'currentColor', 'stroke-width': 2 }),
+      h('rect', { x: '17', y: '8', width: '5', height: '7', stroke: 'currentColor', 'stroke-width': 2 }),
+      h('path', { d: 'M3 8v1M11.5 8v1M19 8v1', stroke: 'currentColor', 'stroke-width': 1 })
     ]),
-    action: () => {
-      activePage.value = '知识库管理'
-      emit('page-change', 'knowledge')
-    }
+    route: '/knowledge'
   }
 ]
+
+const navigate = (item) => {
+  if (item.action) {
+    item.action()
+  } else if (item.route) {
+    router.push(item.route)
+  }
+}
+
+const openGitHub = () => {
+  window.open('https://github.com/gaojiayi/Nas-AI-Assistant', '_blank')
+}
 </script>
 
 <style scoped>
@@ -187,15 +200,9 @@ const menuItems = [
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-}
-
-.user-avatar:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 16px rgba(255, 107, 107, 0.3);
 }
 
 .avatar-content {
@@ -203,46 +210,6 @@ const menuItems = [
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.chat-button {
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.chat-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.05);
-}
-
-.chat-icon {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.add-button {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.add-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  transform: scale(1.05);
 }
 
 /* 右侧菜单区域 */
@@ -265,8 +232,8 @@ const menuItems = [
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 12px 16px;
+  gap: 12px;
+  padding: 14px 20px;
   border-radius: 12px;
   color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
@@ -298,8 +265,8 @@ const menuItems = [
 }
 
 .nav-icon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -313,10 +280,76 @@ const menuItems = [
   background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
 }
 
+/* 申明样式 */
+.declaration-section {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.declaration-item {
+  padding: 0 20px;
+}
+
+.declaration-content {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.app-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.version {
+  font-size: 10px;
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+}
+
+.made-by {
+  font-size: 11px;
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.copyright {
+  font-size: 10px;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.github-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  transition: all 0.3s ease;
+}
+
+.github-link:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.github-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* 收缩状态的样式调整 */
 .sidebar.collapsed .nav-item {
   justify-content: center;
-  padding: 12px;
+  padding: 10px;
 }
 
 .sidebar.collapsed .nav-icon {
