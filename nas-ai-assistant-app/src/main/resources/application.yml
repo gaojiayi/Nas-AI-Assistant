@@ -1,0 +1,66 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: nas-ai-assistant-app
+
+
+  ai:
+    retry:
+      max-attempts: 1
+      on-client-errors: false
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      chat:
+        model: ${OLLAMA_MODEL:qwen3:8b}
+        options:
+          temperature: 0.7
+    dashscope:
+      api-key: ${DASHSCOPE_API_KEY}
+      chat:
+        options:
+          model: ${DASHSCOPE_MODEL:qwen3-max-2026-01-23}
+          temperature: 0.7
+      embedding:
+        options:
+          model: ${DASHSCOPE_EMBEDDING_MODEL:text-embedding-v4}
+          dimensions: 1024
+
+# MySQL 数据源配置
+  datasource:
+    jdbc-url: ${MYSQL_URL:jdbc:mysql://localhost:3306/super_ai_agent?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:root123}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+
+
+pgvector:
+  datasource:
+    jdbc-url: ${POSTGRESQL_URL:jdbc:postgresql://localhost:5432/super_ai_agent}
+    username: ${POSTGRESQL_USERNAME:postgres}
+    password: ${POSTGRESQL_PASSWORD:postgres123}
+    driver-class-name: org.postgresql.Driver
+    initialize-schema: true
+  ai:
+    vectorstore:
+      pgvector:
+      # 【核心开关】设置为 true 开启自动建表和扩展
+        initialize-schema: true 
+        # 索引类型	           原理	                            速度	        准确率	    内存占用	           适用场景
+        # FLAT (暴力检索)	    逐个计算距离	                      慢	        100%	    低 (仅存数据)	        小数据量 (<1万)，或对准确率要求极高的金融/医疗场景
+        # HNSW (图索引)	      构建多层图结构，像“高速公路”导航	    极快	        高	      极高 (数据的数倍)	    最常用。实时推荐、对话机器人，追求毫秒级响应
+        # IVF (倒排索引)	    先聚类分区，只在相关区查找	          中等	        中高	    中等	                大数据量，内存受限，允许少量准确率损失
+        # DiskANN (磁盘索引)	数据在磁盘，导航图在内存	            较快	        中高	    极低	                海量数据 (亿级)，内存不足以装下所有数据时
+        index-type: HNSW # 这是一个在 速度、准确率（召回率） 和 内存成本 之间做权衡的过程。
+        dimensions: 1024 
+        # 存储：维度越高，占用的磁盘和内存空间越大。
+        # 计算：维度越高，计算两个向量之间相似度（如余弦相似度）时的计算量越大，搜索速度可能会变慢。
+        distance-type: COSINE_DISTANCE  #（余弦距离	） 决定了如何计算两个向量之间的“相似度”标准。
+        max-document-batch-size: 10000
+        # 表名配置
+        table-name: vector_store
+        schema-name: public

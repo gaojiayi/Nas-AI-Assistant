@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "amap-maps": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@amap/amap-maps-mcp-server"
+      ],
+      "env": {
+        "AMAP_MAPS_API_KEY": "de490c304a996dc2fac939148fbc3dce"
+      }
+    },
+     "smart-image-scraper": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "smart-image-scraper-mcp"
+      ],
+      "env": {
+        "IMAGE_OUTPUT_DIR": "./images" 
+      }
+    }
+  }
+}
