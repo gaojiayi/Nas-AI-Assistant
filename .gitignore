@@ -2,5 +2,5 @@
 # Java & Maven
 # ============================================
 target/
-
+.vscode/
 node_modules/

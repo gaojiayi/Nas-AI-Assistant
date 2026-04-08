@@ -99,7 +99,7 @@ public class NasQuestionClassifierService {
         }
 
         // 3. 检测NAS相关关键词
-        if (containsLoveKeyword(lowerQuestion)) {
+        if (containsNasKeyword(lowerQuestion)) {
             return QuestionType.NAS_RELATED;
         }
 
@@ -141,7 +141,7 @@ public class NasQuestionClassifierService {
     /**
      * 检测是否包含NAS相关关键词
      */
-    private static boolean containsLoveKeyword(String question) {
+    private static boolean containsNasKeyword(String question) {
         for (String keyword : NAS_KEYWORDS) {
             if (question.contains(keyword)) {
                 log.debug("检测到NAS相关关键词: {}", keyword);
