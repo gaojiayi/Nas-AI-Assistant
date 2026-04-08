@@ -29,7 +29,7 @@ spring:
 
 # MySQL 数据源配置
   datasource:
-    jdbc-url: ${MYSQL_URL:jdbc:mysql://localhost:3306/super_ai_agent?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
+    jdbc-url: ${MYSQL_URL:jdbc:mysql://localhost:3306/nas_ai_agent?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
     username: ${MYSQL_USERNAME:root}
     password: ${MYSQL_PASSWORD:root123}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -40,11 +40,9 @@ spring:
 
 pgvector:
   datasource:
-    jdbc-url: ${POSTGRESQL_URL:jdbc:postgresql://localhost:5432/super_ai_agent}
+    url: ${POSTGRESQL_URL:jdbc:postgresql://localhost:5432/nas_ai_agent}
     username: ${POSTGRESQL_USERNAME:postgres}
     password: ${POSTGRESQL_PASSWORD:postgres123}
-    driver-class-name: org.postgresql.Driver
-    initialize-schema: true
   ai:
     vectorstore:
       pgvector:
@@ -62,5 +60,5 @@ pgvector:
         distance-type: COSINE_DISTANCE  #（余弦距离	） 决定了如何计算两个向量之间的“相似度”标准。
         max-document-batch-size: 10000
         # 表名配置
-        table-name: vector_store
+        vector-table-name: vector_store
         schema-name: public
