@@ -1,4 +1,4 @@
-package com.monuo.superaiagent.chatmemory;
+package com.gaojiayi.nasaiassistantapp.chatmemory;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -6,8 +6,6 @@ import com.esotericsoftware.kryo.io.Output;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.prompt.PromptTemplate;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

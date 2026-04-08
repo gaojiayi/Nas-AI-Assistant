@@ -1,39 +1,64 @@
 package com.gaojiayi.nasaiassistantapp.chatmemory;
+
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.stereotype.Component;
+
+import com.gaojiayi.nasaiassistantapp.common.MessageConverter;
+import com.gaojiayi.nasaiassistantapp.entity.ChatMessage;
+import com.gaojiayi.nasaiassistantapp.repository.ChatMessageRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor// 构造函数注入
+@RequiredArgsConstructor //构造函数注入
 public class DatabaseBasedChatMemory implements ChatMemory {
 
     private static final Logger log = LoggerFactory.getLogger(DatabaseBasedChatMemory.class);
 
+    private final ChatMessageRepository chatMessageRepository;
 
     @Override
     public void add(String conversationId, List<Message> messages) {
-        log.info("Adding messages to conversation: {}", conversationId);
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'add'");
+        if (messages == null || messages.isEmpty()) {
+            log.debug("No messages to save for conversation {}", conversationId);
+            return;
+        }
+        // 用户可能真的想发送相同的内容，这是正常的对话行为
+        List<ChatMessage> newChatMessages = messages.stream()
+                .map(message -> MessageConverter.toChatMessage(message, conversationId))
+                .collect(Collectors.toList());
+
+        if (newChatMessages.isEmpty()) {
+            log.debug("No messages to convert for conversation {}", conversationId);
+            return;
+        }
+
+        // 批量保存新消息
+        chatMessageRepository.saveBatch(newChatMessages, newChatMessages.size());
+        log.debug("Saved {} messages for conversation {}", newChatMessages.size(), conversationId);
     }
 
     @Override
     public List<Message> get(String conversationId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'get'");
+        List<ChatMessage> chatMessages = chatMessageRepository.listByConversationId(conversationId);
+        List<Message> messages = chatMessages.stream()
+                .map(MessageConverter::toMessage)
+                .collect(Collectors.toList());
+
+        log.debug("Retrieved {} messages for conversation {}", messages.size(), conversationId);
+        return messages;
     }
 
     @Override
     public void clear(String conversationId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'clear'");
+        chatMessageRepository.deleteByConversationId(conversationId);
+        log.debug("Cleared all messages for conversation {}", conversationId);
     }
-    
-  
+
 }

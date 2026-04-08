@@ -53,7 +53,7 @@ public class RagService {
      * @param message 原始消息
      * @return 是否有相关文档
      */
-    public boolean hasRelevanDocs(String message) {
+    public boolean hasRelevantDocs(String message) {
         try {
             String rewrittenMessage = rewriteQuery(message);
             List<Document> docs = searchSimilarDocuments(rewrittenMessage, RAG_TOP_K);

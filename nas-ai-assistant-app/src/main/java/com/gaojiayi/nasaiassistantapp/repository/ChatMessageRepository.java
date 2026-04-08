@@ -58,4 +58,9 @@ public class ChatMessageRepository extends ServiceImpl<ChatMessageMapper, ChatMe
         return conversations;
     }
 
+    public List<ConversationVO> listConversations() {
+        List<ConversationVO> conversations = baseMapper.listConversations();  
+        return conversations != null ? conversations : Collections.emptyList();
+    }
+
 }

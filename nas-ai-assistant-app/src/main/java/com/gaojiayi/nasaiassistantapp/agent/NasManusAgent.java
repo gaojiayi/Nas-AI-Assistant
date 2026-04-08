@@ -46,7 +46,7 @@ public class NasManusAgent extends ThinkingAgent {
             DatabaseBasedChatMemory databaseBasedChatMemory) {
         super(manusTools);
         this.databaseBasedChatMemory = databaseBasedChatMemory;
-        this.setName("monuoManus");
+        this.setName("NasManus");
 
         // 获取当前日期
         java.time.LocalDate now = java.time.LocalDate.now();
@@ -64,8 +64,8 @@ public class NasManusAgent extends ThinkingAgent {
         this.setChatClient(chatClient);
     }
 
-    public SseEmitter runStream(String userPrompt, String chatId) {
-        SseEmitter sseEmitter = new SseEmitter(300000L);
+    public void runStream(String userPrompt, String chatId, SseEmitter sseEmitter) {
+        // SseEmitter sseEmitter = new SseEmitter(300000L);
         this.chatId = chatId; // 保存 chatId 供 think() 使用
         this.historyLoaded = false; // 重置历史消息加载标志
         getMessageList().clear(); // 清空消息列表
@@ -318,6 +318,78 @@ public class NasManusAgent extends ThinkingAgent {
     public String act() {
         // 调用父类的 act 方法
         return super.act();
+    }
+
+    /**
+     * 重写 think 方法，手动集成数据库记忆
+     * 使用 ToolCallAgent 的手动工具管理方式
+     */
+    @Override
+    public boolean think() {
+        try {
+
+            // 1. 从数据库加载历史消息（只在第一次加载）
+            if (!historyLoaded && chatId != null && !chatId.isEmpty()) {
+                List<Message> historyMessages = databaseBasedChatMemory.get(chatId);
+                if (historyMessages != null && !historyMessages.isEmpty()) {
+                    // 【关键修复】历史消息应该插入到当前用户消息之前，而不是追加到末尾
+                    // 这样才能保证消息顺序正确：历史消息 -> 当前用户消息 -> AI回复
+                    int currentSize = getMessageList().size();
+                    if (currentSize > 0) {
+                        // 获取最后一条消息（当前用户消息）
+                        Message currentUserMessage = getMessageList().remove(currentSize - 1);
+                        // 添加历史消息
+                        getMessageList().addAll(historyMessages);
+                        // 重新添加当前用户消息
+                        getMessageList().add(currentUserMessage);
+                    } else {
+                        // 如果消息列表为空，直接添加历史消息
+                        getMessageList().addAll(historyMessages);
+                    }
+                }
+                historyLoaded = true;
+            }
+            // 2. 添加 nextStepPrompt（如果有）
+            if (getNextStepPrompt() != null && !getNextStepPrompt().isEmpty()) {
+                UserMessage userMessage = new UserMessage(getNextStepPrompt());
+                getMessageList().add(userMessage);
+            }
+
+            // 3. 使用父类的 think 方法（会禁用 Spring AI 内置工具执行）
+            return super.think();
+
+        } catch (Exception e) {
+            // 获取错误信息
+            String errorMsg = e.getMessage();
+            String errorType = Utils.getErrorType(errorMsg);
+
+            // 增加错误计数
+            int errorCount = errorCountMap.getOrDefault(errorType, 0) + 1;
+            errorCountMap.put(errorType, errorCount);
+            log.warn("捕获到错误 [{}]，当前计数: {}/{}", errorType, errorCount, MAX_SAME_ERROR_COUNT);
+
+            // 检查是否达到错误阈值
+            if (errorCount >= MAX_SAME_ERROR_COUNT) {
+                log.error("错误 [{}] 已出现 {} 次，发送友好提示给用户", errorType, errorCount);
+
+                // 根据错误类型生成友好提示
+                String friendlyMessage = Utils.generateFriendlyErrorMessage(errorType, errorMsg);
+
+                // 添加友好的错误消息
+                AssistantMessage errorMessage = new AssistantMessage(friendlyMessage);
+                getMessageList().add(errorMessage);
+
+                // 清空该错误的计数（避免下次对话继续累积）
+                errorCountMap.remove(errorType);
+
+                // 标记为完成，不再重试
+                setState(AgentState.FINISHED);
+                return false;
+            }
+
+            // 未达到阈值，继续抛出异常让 Spring AI 重试
+            throw e;
+        }
     }
 
     /**

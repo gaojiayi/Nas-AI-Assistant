@@ -54,6 +54,9 @@ public class ToolCallAgent extends ReActAgent {
         this.toolCallChatResponse = toolCallChatResponse;
     }
 
+    /**
+     * 在父类中已经使用了 think 方法，这里不需要重写
+     */
     public boolean think() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'think'");
