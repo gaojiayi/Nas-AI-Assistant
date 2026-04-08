@@ -65,7 +65,6 @@ public class NasManusAgent extends ThinkingAgent {
     }
 
     public void runStream(String userPrompt, String chatId, SseEmitter sseEmitter) {
-        // SseEmitter sseEmitter = new SseEmitter(300000L);
         this.chatId = chatId; // 保存 chatId 供 think() 使用
         this.historyLoaded = false; // 重置历史消息加载标志
         getMessageList().clear(); // 清空消息列表
@@ -307,7 +306,6 @@ public class NasManusAgent extends ThinkingAgent {
 
         });
 
-        return sseEmitter;
     }
 
     /**
