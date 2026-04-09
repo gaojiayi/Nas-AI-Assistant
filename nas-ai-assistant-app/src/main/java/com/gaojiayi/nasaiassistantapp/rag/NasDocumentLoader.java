@@ -27,7 +27,7 @@ public class NasDocumentLoader {
     public List<Document> loadMarkdowns() {
         List<Document> allDocuments = new ArrayList<>();
         try {
-            Resource[] resources = resourcePatternResolver.getResources("classpath*:document/*.md");
+            Resource[] resources = resourcePatternResolver.getResources("classpath*:documents/*.md");
             for (Resource resource : resources) {
                 String filename = resource.getFilename();
                 // 从文件名中提取状态：格式为 "nas-技术篇.md"

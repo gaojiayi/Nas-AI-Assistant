@@ -18,7 +18,6 @@ import javax.sql.DataSource;
  * 数据源配置
  */
 @Configuration
-@Profile("!test")
 public class DataSourceConfig {
 
     /**

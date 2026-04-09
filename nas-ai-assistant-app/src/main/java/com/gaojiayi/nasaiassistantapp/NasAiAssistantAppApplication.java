@@ -12,4 +12,5 @@ public class NasAiAssistantAppApplication {
         SpringApplication.run(NasAiAssistantAppApplication.class, args);
     }
 
+    
 }

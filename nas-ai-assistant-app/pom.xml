@@ -33,6 +33,8 @@
 
     <properties>
         <java.version>21</java.version>
+        <spring-ai.version> 1.0.0</spring-ai.version>
+
         <spring-ai.version>1.0.0</spring-ai.version>
         <spring-ai-alibaba.version>1.0.0.2</spring-ai-alibaba.version>
         <mockito.version>5.17.0</mockito.version>
@@ -131,13 +133,12 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <!--
+        
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-pgvector-store</artifactId>
-            <version>1.0.0-M4</version>
         </dependency>
-        -->
+       
 
         <!-- Automatic integration of PGVector vector storage-->
         <!--        <dependency>-->

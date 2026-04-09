@@ -7,7 +7,7 @@ spring:
   application:
     name: nas-ai-assistant-app
   profiles:
-    active: local
+    active: cloud
   ai:
     retry:
       max-attempts: 1
