@@ -10,7 +10,6 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.ai.document.Document;
 import lombok.extern.slf4j.Slf4j;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -31,7 +30,7 @@ public class NasDocumentLoader {
             Resource[] resources = resourcePatternResolver.getResources("classpath*:document/*.md");
             for (Resource resource : resources) {
                 String filename = resource.getFilename();
-                // 从文件名中提取状态：格式为 "nas-技术.md"
+                // 从文件名中提取状态：格式为 "nas-技术篇.md"
                 String status = "";
                 int dashIndex = filename.lastIndexOf(" - ");
                 int suffixIndex = filename.lastIndexOf("篇.md");

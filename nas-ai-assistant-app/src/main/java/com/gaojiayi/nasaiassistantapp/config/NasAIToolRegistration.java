@@ -1,6 +1,5 @@
 package com.gaojiayi.nasaiassistantapp.config;
 
-import jakarta.annotation.Resource;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +40,7 @@ public class NasAIToolRegistration {
      * MCP工具回调提供者
      * 用于获取通过MCP协议集成的外部工具，如高德地图、图片搜索等
      */
-    @Resource
+    @Autowired(required = false)
     private AsyncMcpToolCallbackProvider toolCallbackProvider;
     
     /**
@@ -107,7 +106,8 @@ public class NasAIToolRegistration {
                 nasImageSearchTool);
 
         // MCP工具：通过MCP协议集成的外部工具
-        ToolCallback[] mcpTools = toolCallbackProvider.getToolCallbacks();
+        ToolCallback[] mcpTools = (toolCallbackProvider != null) ? 
+                toolCallbackProvider.getToolCallbacks() : new ToolCallback[0];
 
         // 合并本地工具和MCP工具，返回完整的工具集
         return Stream.concat(

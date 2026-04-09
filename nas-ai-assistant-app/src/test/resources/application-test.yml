@@ -1,0 +1,104 @@
+spring:
+  # 允许Bean定义覆盖，测试配置可以覆盖生产配置
+  main:
+    allow-bean-definition-overriding: true
+  
+  # 禁用自动schema初始化，避免加载MySQL的schema
+  sql:
+    init:
+      mode: never
+  
+  # 使用 H2 内存数据库进行测试
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  # 测试用的 DashScope 配置
+  ai:
+    dashscope:
+      api-key: test-api-key
+      chat:
+        options:
+          model: qwen3-max-2026-01-23
+          temperature: 0.7
+      embedding:
+        options:
+          model: text-embedding-v4
+          dimensions: 1024
+
+  # 禁用一些不需要的功能
+  retry:
+    max-attempts: 1
+    on-client-errors: false
+
+# PGVector 测试配置（使用内存数据库或禁用）
+pgvector:
+  datasource:
+    jdbc-url: jdbc:h2:mem:testpgvector;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+    initialize-schema: false
+  ai:
+    vectorstore:
+      pgvector:
+        initialize-schema: false
+        dimensions: 1024
+        distance-type: COSINE_DISTANCE
+        max-document-batch-size: 1000
+        table-name: test_vector_store
+        schema-name: public
+
+# MyBatis Plus 测试配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: isDelete
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# 测试服务器配置
+server:
+  port: 0  # 随机端口
+
+# 禁用 Swagger
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# 测试用的搜索配置
+search-api:
+  api-key: test-search-key
+  tavily-api-key: test-tavily-key
+
+# 测试用的邮件配置
+qq-email:
+  from: test@qq.com
+  auth-code: test-auth-code
+  smtp-host: smtp.qq.com
+  smtp-port: 587
+
+# 禁用管理端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: none
+  endpoint:
+    health:
+      enabled: false
+
+# 日志配置
+logging:
+  level:
+    com.gaojiayi.nasaiassistantapp: DEBUG
+    org.springframework.ai: DEBUG
+    com.alibaba.cloud.ai: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

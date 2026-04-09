@@ -7,6 +7,8 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
+import org.springframework.lang.NonNull;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -16,6 +18,7 @@ import javax.sql.DataSource;
  * 数据源配置
  */
 @Configuration
+@Profile("!test")
 public class DataSourceConfig {
 
     /**
@@ -45,7 +48,7 @@ public class DataSourceConfig {
      */
     @Bean(name = "primaryJdbcTemplate")
     public JdbcTemplate primaryJdbcTemplate(
-            @Qualifier("primaryDataSource") DataSource dataSource) {
+            @Qualifier("primaryDataSource") @NonNull DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
 
@@ -55,7 +58,7 @@ public class DataSourceConfig {
      */
     @Bean(name = "vectorJdbcTemplate")
     public JdbcTemplate vectorJdbcTemplate(
-            @Qualifier("pgVectorDataSource") DataSource dataSource) {
+            @Qualifier("pgVectorDataSource") @NonNull DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
 }

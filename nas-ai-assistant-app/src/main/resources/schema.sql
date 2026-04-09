@@ -1,12 +1,12 @@
 -- 创建数据库（如果不存在）
 -- 注意：云环境部署时请谨慎使用，避免删除已有数据
-CREATE DATABASE IF NOT EXISTS `super_ai_agent`
+CREATE DATABASE IF NOT EXISTS `nas_ai_agent`
     DEFAULT CHARACTER SET utf8mb4
     COLLATE utf8mb4_general_ci;
 
-USE `super_ai_agent`;
+USE `nas_ai_agent`;
 
--- 导出 表 super_ai_agent.chat_message 结构
+-- 导出 表 nas_ai_agent.chat_message 结构
 -- 使用 DROP TABLE IF EXISTS 避免重复创建报错
 DROP TABLE IF EXISTS `chat_message`;
 CREATE TABLE IF NOT EXISTS `chat_message` (

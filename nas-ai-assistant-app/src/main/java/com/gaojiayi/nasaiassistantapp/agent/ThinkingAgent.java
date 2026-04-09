@@ -263,4 +263,18 @@ public class ThinkingAgent extends ToolCallAgent {
 
     }
 
+    
+    /**
+     * 获取最后一条用户消息
+     */
+    private String getLastUserMessage() {
+        for (int i = getMessageList().size() - 1; i >= 0; i--) {
+            org.springframework.ai.chat.messages.Message msg = getMessageList().get(i);
+            if (msg instanceof UserMessage) {
+                return ((UserMessage) msg).getText();
+            }
+        }
+        return null;
+    }
+
 }
