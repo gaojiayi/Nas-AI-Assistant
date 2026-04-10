@@ -140,15 +140,42 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { uploadedFilesMock, statsDataMock } from '../mock/knowledgeData.js'
+import { ref, onMounted } from 'vue'
+import { knowledgeAPI } from '../services/api.js'
 
 const isDragOver = ref(false)
 const fileInput = ref(null)
 const selectedFile = ref(null)
+const loading = ref(false)
 
-const uploadedFiles = ref(uploadedFilesMock)
-const statsData = ref(statsDataMock)
+const uploadedFiles = ref([])
+const statsData = ref({
+  totalDocuments: 0,
+  storageSpace: '0GB',
+  processing: 0,
+  indexed: 0
+})
+
+// 加载知识库数据
+const loadKnowledgeData = async () => {
+  loading.value = true
+  try {
+    const [filesData, stats] = await Promise.all([
+      knowledgeAPI.getUploadedFiles(),
+      knowledgeAPI.getStats()
+    ])
+    uploadedFiles.value = filesData
+    statsData.value = stats
+  } catch (error) {
+    console.error('加载知识库数据失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  loadKnowledgeData()
+})
 
 const handleDrop = (e) => {
   e.preventDefault()

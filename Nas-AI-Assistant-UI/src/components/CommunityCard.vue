@@ -1,5 +1,5 @@
 <template>
-  <div class="community-card" @click="handlePlay">
+  <div class="community-card" :class="cardTypeClass" @click="handlePlay">
     <div class="card-image" :class="imageClass">
       <div class="image-placeholder"></div>
       <div class="play-button">
@@ -33,12 +33,18 @@ const props = defineProps({
   description: String,
   image: String,
   onlineCount: Number,
-  memberCount: Number
+  memberCount: Number,
+  type: {
+    type: String,
+    default: 'community' // 'community' or 'feature'
+  }
 })
 
 const emit = defineEmits(['play'])
 
 const imageClass = computed(() => `image-${props.image}`)
+
+const cardTypeClass = computed(() => `card-type-${props.type}`)
 
 const formatNumber = (num) => {
   if (num >= 1000000) {
@@ -76,6 +82,21 @@ const handlePlay = () => {
   background: rgba(255, 255, 255, 0.08);
   transform: translateY(-12px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* 体验社区类型card的特定样式 */
+.card-type-community {
+  /* 体验社区特有的样式可以在这里添加 */
+}
+
+/* 关键特性类型card的特定样式 */
+.card-type-feature {
+  /* 关键特性特有的样式可以在这里添加 */
+  aspect-ratio: 16 / 10; /* 不同的宽高比 */
+}
+
+.card-type-feature:hover {
+  transform: translateY(-8px); /* 不同的悬停效果 */
 }
 
 .card-image {

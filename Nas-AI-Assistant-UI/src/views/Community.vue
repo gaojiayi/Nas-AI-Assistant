@@ -18,6 +18,7 @@
                 :title="card.title"
                 :description="card.description"
                 :image="card.image"
+                type="community"
                 @play="openPlayer"
               />
             </div>
@@ -91,16 +92,38 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { communityCardsMock, communityPageInfoMock } from '../mock/communityData.js'
+import { ref, computed, onMounted } from 'vue'
+import { communityAPI } from '../services/api.js'
 import CommunityCard from '../components/CommunityCard.vue'
 
 const currentSlide = ref(0)
 const showPlayer = ref(false)
 const currentPlayerData = ref(null)
+const loading = ref(false)
 
-const communityCards = ref(communityCardsMock)
-const pageInfo = ref(communityPageInfoMock)
+const communityCards = ref([])
+const pageInfo = ref({})
+
+// 加载社区数据
+const loadCommunityData = async () => {
+  loading.value = true
+  try {
+    const [cardsData, pageData] = await Promise.all([
+      communityAPI.getCards(),
+      communityAPI.getPageInfo()
+    ])
+    communityCards.value = cardsData
+    pageInfo.value = pageData
+  } catch (error) {
+    console.error('加载社区数据失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  loadCommunityData()
+})
 
 const totalSlides = computed(() => communityCards.value.length)
 
