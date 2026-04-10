@@ -348,7 +348,9 @@ const toggleRAG = () => {
 }
 
 const toggleTools = () => {
+  const oldValue = enableTools.value
   enableTools.value = !enableTools.value
+  console.log('toggleTools called:', oldValue, '->', enableTools.value)
 }
 
 const toggleThinking = () => {
@@ -383,6 +385,7 @@ const sendMessage = async () => {
   scrollToBottom()
   
   isTyping.value = true
+  console.log('sendMessage - enableTools:', enableTools.value, 'enableRAG:', enableRAG.value, 'enableThinking:', enableThinking.value)
   await nextTick()
   scrollToBottom()
   
@@ -418,6 +421,7 @@ const generateAIResponse = async (userInput) => {
   try {
     thinkingSteps.value = []
     
+    console.log('generateAIResponse - enableTools:', enableTools.value, 'enableRAG:', enableRAG.value, 'enableThinking:', enableThinking.value)
     const stream = await chatAPI.sendMessage(userInput, {
       chatId: currentConversationId.value || 'default',
       enableRAG: enableRAG.value,
@@ -565,6 +569,10 @@ const scrollToBottom = () => {
 }
 
 onMounted(async () => {
+  enableRAG.value = false
+  enableTools.value = false
+  enableThinking.value = false
+  console.log('onMounted - enableTools:', enableTools.value, 'enableRAG:', enableRAG.value, 'enableThinking:', enableThinking.value)
   await initializeConversations()
   scrollToBottom()
 })

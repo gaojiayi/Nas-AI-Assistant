@@ -87,7 +87,7 @@ export const chatAPI = {
     const params = new URLSearchParams({
       message: message,
       chatId: options.chatId || 'default',
-      enableTools: options.enableRAG || false,
+      enableTools: options.enableTools || false,
       enableRAG: options.enableRAG || false,
       enableThink: options.enableThinking || false
     })
