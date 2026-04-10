@@ -1,8 +1,10 @@
 package com.gaojiayi.nasaiassistantapp.controller;
 
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -14,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RestController
-@RequestMapping("/api/ai/nas")
+@RequestMapping("/ai/nas")
 public class NasAIChatController {
 
     private static final Logger log = LoggerFactory.getLogger(NasAIChatController.class);
@@ -77,7 +79,8 @@ public class NasAIChatController {
                     .chatStream(message, chatId, enableTools != null && enableTools, enableRAG != null && enableRAG)
                     .subscribe(chunk -> {
                         try {
-                            sseEmitter.send(chunk);
+                            sseEmitter.send(SseEmitter.event().data(chunk));
+
                         } catch (IOException e) {
                             sseEmitter.completeWithError(e);
                         }

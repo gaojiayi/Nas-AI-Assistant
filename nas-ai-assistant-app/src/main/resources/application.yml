@@ -18,7 +18,7 @@ spring:
         model: ${OLLAMA_MODEL:qwen3:8b}
         options:
           temperature: 0.7
-    dashscope:
+    dashscope:  
       api-key: ${DASHSCOPE_API_KEY:sk-308ebb98395b4976af5f52c782fcd6ee}
       chat:
         options:

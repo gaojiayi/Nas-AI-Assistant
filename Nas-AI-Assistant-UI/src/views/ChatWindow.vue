@@ -1,64 +1,71 @@
 <template>
   <div class="chat-window">
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <h2>对话历史</h2>
-        <button class="new-chat-btn" @click="createNewChat">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          新建对话
-        </button>
-      </div>
-      <div class="conversation-list">
-        <div 
-          v-for="(conversation, index) in conversations" 
-          :key="conversation.id"
-          :class="['conversation-item', { active: currentConversationId === conversation.id }]"
-          @click="switchConversation(conversation.id)"
-        >
-          <button 
-            class="delete-conversation-btn" 
-            @click.stop="confirmDeleteConversation(conversation.id)"
-            title="删除对话"
-          >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </button>
-          <div class="conversation-preview">
-            <p class="conversation-title">{{ conversation.title || '新对话' }}</p>
-            <p class="conversation-last-message">{{ conversation.lastMessage || '暂无消息' }}</p>
-          </div>
-          <div class="conversation-time">{{ formatConversationTime(conversation.updatedAt) }}</div>
-        </div>
-      </div>
+    <div class="page-header">
+      <h1>AI 助手</h1>
+      <p>智能对话助手，随时为您提供帮助</p>
     </div>
     
-    <div class="main-content">
-      <div class="page-header">
-        <h1>AI 助手</h1>
-        <p>智能对话助手，随时为您提供帮助</p>
-      </div>
-      
-      <div class="chat-container">
-        <div class="chat-messages" ref="messagesContainer">
-        <div class="message ai-message">
-          <div class="message-avatar">
-            <img src="/logo.jpeg" alt="AI助手" class="ai-avatar-image" />
-          </div>
-          <div class="message-content">
-            <p>您好！我是您的NAS AI助手，有什么可以帮助您的吗？</p>
-            <span class="message-time">刚刚</span>
+    <div class="content-area">
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h2>对话历史</h2>
+          <button class="new-chat-btn" @click="createNewChat">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            新建对话
+          </button>
+        </div>
+        <div class="conversation-list">
+          <div 
+            v-for="(conversation, index) in conversations" 
+            :key="conversation.id"
+            :class="['conversation-item', { active: currentConversationId === conversation.id }]"
+            @click="switchConversation(conversation.id)"
+          >
+            <button 
+              class="delete-conversation-btn" 
+              @click.stop="confirmDeleteConversation(conversation.id)"
+              title="删除对话"
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div class="conversation-preview">
+              <p class="conversation-title">{{ getConversationTitle(conversation) }}</p>
+              <p class="conversation-last-message">{{ conversation.lastMessage || '暂无消息' }}</p>
+            </div>
+            <div class="conversation-time">{{ formatConversationTime(conversation.updatedAt) }}</div>
           </div>
         </div>
-        
-        <div v-for="(message, index) in messages" :key="index" :class="['message', message.sender === 'user' ? 'user-message' : 'ai-message']">
+      </div>
+      
+      <div class="main-content">
+        <div class="chat-container">
+        <div class="chat-messages" ref="messagesContainer">
+        <div v-for="(message, index) in messages" :key="index" :class="['message', message.sender === 'user' ? 'user-message' : 'ai-message', { 'error-message': message.isError }]">
           <div v-if="message.sender === 'ai'" class="message-avatar">
             <img src="/logo.jpeg" alt="AI助手" class="ai-avatar-image" />
           </div>
           <div class="message-content">
-            <p>{{ message.text }}</p>
+            <div v-if="message.thinkingSteps && message.thinkingSteps.length > 0" class="thinking-process">
+              <div class="thinking-header">
+                <span class="thinking-icon">🤔</span>
+                <span class="thinking-title">AI 思考过程...</span>
+              </div>
+              <div class="thinking-steps">
+                <div v-for="(step, stepIndex) in message.thinkingSteps" :key="stepIndex" class="thinking-step">
+                  {{ stepIndex + 1 }}. {{ step }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="message-text-container">
+              <div v-if="message.sender === 'ai'" class="message-text markdown-body" v-html="renderMarkdown(message.text)"></div>
+              <p v-if="message.sender === 'user'" class="message-text">{{ message.text }}</p>
+            </div>
+            
             <span class="message-time">{{ formatTime(message.time) }}</span>
           </div>
           <div v-if="message.sender === 'user'" class="message-avatar">
@@ -101,7 +108,6 @@
           </button>
         </div>
         
-        <!-- 功能按钮 -->
         <div class="feature-buttons">
           <button 
             class="feature-btn" 
@@ -132,9 +138,9 @@
           </button>
         </div>
       </div>
+      </div>
     </div>
     
-    <!-- 删除确认对话框 -->
     <div v-if="showDeleteConfirm" class="delete-confirm-overlay" @click="cancelDelete">
       <div class="delete-confirm-dialog" @click.stop>
         <h3>确认删除对话</h3>
@@ -152,83 +158,129 @@
 <script setup>
 import { ref, nextTick, onMounted } from 'vue'
 import { chatAPI } from '../services/api.js'
+import MarkdownIt from 'markdown-it'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/atom-one-dark.css'
+
+const md = new MarkdownIt({
+  html: false,
+  linkify: true,
+  typographer: true,
+  highlight: function (str, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return '<pre class="hljs"><code>' +
+          hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
+          '</code></pre>'
+      } catch (__) {}
+    }
+    return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>'
+  }
+})
+
+const renderMarkdown = (text) => {
+  if (!text) return ''
+  return md.render(text)
+}
+
+const throttle = (func, delay) => {
+  let lastCall = 0
+  return function(...args) {
+    const now = Date.now()
+    if (now - lastCall < delay) return
+    lastCall = now
+    return func.apply(this, args)
+  }
+}
+
+const throttledHighlight = throttle(() => {
+  if (typeof hljs !== 'undefined') {
+    document.querySelectorAll('pre code').forEach((block) => {
+      hljs.highlightElement(block)
+    })
+  }
+}, 200)
 
 const inputMessage = ref('')
 const messages = ref([])
 const isTyping = ref(false)
 const messagesContainer = ref(null)
 
-// 功能按钮状态
 const enableRAG = ref(false)
 const enableTools = ref(false)
 const enableThinking = ref(false)
 
-// 对话历史管理
 const conversations = ref([])
 const currentConversationId = ref(null)
 
-// 删除确认相关
 const showDeleteConfirm = ref(false)
 const conversationToDelete = ref(null)
 
-// 初始化对话历史
-const initializeConversations = () => {
-  // 从localStorage加载对话历史
-  const saved = localStorage.getItem('chat_conversations')
-  if (saved) {
-    conversations.value = JSON.parse(saved)
-  } else {
-    // 创建默认对话
+const initializeConversations = async () => {
+  try {
+    const apiConversations = await chatAPI.getConversations()
+    
+    conversations.value = apiConversations.map(conv => ({
+      id: conv.conversationId,
+      lastMessage: conv.lastMessage || '暂无消息',
+      updatedAt: conv.lastMessageTime
+    }))
+    
+    if (conversations.value.length > 0) {
+      currentConversationId.value = conversations.value[0].id
+      loadConversationMessages(currentConversationId.value)
+    } else {
+      createNewChat()
+    }
+  } catch (error) {
+    console.error('加载对话历史失败:', error)
     createNewChat()
-  }
-  
-  // 设置当前对话ID
-  if (conversations.value.length > 0) {
-    currentConversationId.value = conversations.value[0].id
-    // 加载当前对话的消息
-    loadConversationMessages(currentConversationId.value)
   }
 }
 
-// 创建新对话
 const createNewChat = () => {
   const newConversation = {
     id: Date.now().toString(),
-    title: '新对话',
     lastMessage: '',
-    messages: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date()
   }
   
   conversations.value.unshift(newConversation)
   currentConversationId.value = newConversation.id
   messages.value = []
-  
-  saveConversations()
 }
 
-// 切换对话
 const switchConversation = (conversationId) => {
   currentConversationId.value = conversationId
   loadConversationMessages(conversationId)
 }
 
-// 加载对话消息
-const loadConversationMessages = (conversationId) => {
-  const conversation = conversations.value.find(c => c.id === conversationId)
-  if (conversation) {
-    messages.value = conversation.messages || []
-    nextTick(() => scrollToBottom())
+const loadConversationMessages = async (conversationId) => {
+  try {
+    const apiMessages = await chatAPI.getConversationHistory(conversationId)
+    
+    messages.value = apiMessages.map(msg => ({
+      sender: msg.role === 'assistant' ? 'ai' : msg.role,
+      text: msg.content,
+      time: new Date(msg.createTime),
+      thinkingSteps: msg.thinkingSteps || [],
+      isComplete: true
+    }))
+    
+    nextTick(() => {
+      scrollToBottom()
+      if (typeof hljs !== 'undefined') {
+        document.querySelectorAll('pre code').forEach((block) => {
+          hljs.highlightElement(block)
+        })
+      }
+    })
+  } catch (error) {
+    console.error('加载对话消息失败:', error)
+    messages.value = []
   }
 }
 
-// 保存对话历史到localStorage
-const saveConversations = () => {
-  localStorage.setItem('chat_conversations', JSON.stringify(conversations.value))
-}
-
-// 格式化对话时间
 const formatConversationTime = (dateString) => {
   const date = new Date(dateString)
   const now = new Date()
@@ -245,55 +297,62 @@ const formatConversationTime = (dateString) => {
   return `${days}天前`
 }
 
-// 确认删除对话
+const getConversationTitle = (conversation) => {
+  if (!conversation.lastMessage) return '新对话'
+  const title = conversation.lastMessage.substring(0, 20)
+  return conversation.lastMessage.length > 20 ? title + '...' : title
+}
+
 const confirmDeleteConversation = (conversationId) => {
   conversationToDelete.value = conversationId
   showDeleteConfirm.value = true
 }
 
-// 取消删除
 const cancelDelete = () => {
   showDeleteConfirm.value = false
   conversationToDelete.value = null
 }
 
-// 确认删除
-const confirmDelete = () => {
+const confirmDelete = async () => {
   if (conversationToDelete.value) {
-    const isCurrentConversation = currentConversationId.value === conversationToDelete.value
-    
-    // 删除对话
-    conversations.value = conversations.value.filter(c => c.id !== conversationToDelete.value)
-    
-    // 如果删除的是当前对话，创建新对话或切换到其他对话
-    if (isCurrentConversation) {
-      if (conversations.value.length > 0) {
-        currentConversationId.value = conversations.value[0].id
-        loadConversationMessages(currentConversationId.value)
+    try {
+      const result = await chatAPI.deleteConversation(conversationToDelete.value)
+      
+      if (result.code === 0) {
+        const isCurrentConversation = currentConversationId.value === conversationToDelete.value
+        
+        conversations.value = conversations.value.filter(c => c.id !== conversationToDelete.value)
+        
+        if (isCurrentConversation) {
+          if (conversations.value.length > 0) {
+            currentConversationId.value = conversations.value[0].id
+            loadConversationMessages(currentConversationId.value)
+          } else {
+            createNewChat()
+          }
+        }
+        
+        cancelDelete()
       } else {
-        createNewChat()
+        alert('删除失败: ' + result.message)
       }
+    } catch (error) {
+      console.error('删除对话失败:', error)
+      alert('删除失败，请稍后重试')
     }
-    
-    saveConversations()
-    cancelDelete()
   }
 }
 
-// 切换RAG状态
 const toggleRAG = () => {
   enableRAG.value = !enableRAG.value
 }
 
-// 切换工具状态
 const toggleTools = () => {
   enableTools.value = !enableTools.value
 }
 
-// 切换推理与思考状态
 const toggleThinking = () => {
   enableThinking.value = !enableThinking.value
-  // 如果启用推理与思考，禁用其他两个选项
   if (enableThinking.value) {
     enableRAG.value = false
     enableTools.value = false
@@ -303,52 +362,34 @@ const toggleThinking = () => {
 const sendMessage = async () => {
   if (!inputMessage.value.trim() || isTyping.value) return
   
-  // 如果没有对话历史，创建新对话
   if (conversations.value.length === 0 || !currentConversationId.value) {
     createNewChat()
   }
   
-  // 添加用户消息
   const userMessage = {
     text: inputMessage.value.trim(),
     sender: 'user',
-    time: new Date()
+    time: new Date(),
+    isComplete: true
   }
   messages.value.push(userMessage)
   
   const userInput = inputMessage.value.trim()
   inputMessage.value = ''
   
-  // 更新当前对话的消息和最后消息
-  updateConversation(userMessage.text)
+  refreshConversations()
   
-  // 滚动到底部
   await nextTick()
   scrollToBottom()
   
-  // 显示AI正在输入
   isTyping.value = true
   await nextTick()
   scrollToBottom()
   
-  // 调用AI回复
   try {
-    const aiResponse = await generateAIResponse(userInput)
-    messages.value.push({
-      text: aiResponse,
-      sender: 'ai',
-      time: new Date()
-    })
-    
-    // 更新对话的最后消息为AI回复
-    updateConversation(aiResponse)
+    await generateAIResponse(userInput)
   } catch (error) {
     console.error('发送消息失败:', error)
-    messages.value.push({
-      text: '抱歉，我无法处理您的请求。请稍后再试。',
-      sender: 'ai',
-      time: new Date()
-    })
   }
   
   isTyping.value = false
@@ -357,65 +398,149 @@ const sendMessage = async () => {
   })
 }
 
-// 更新对话信息
-const updateConversation = (lastMessage) => {
-  const conversation = conversations.value.find(c => c.id === currentConversationId.value)
-  if (conversation) {
-    conversation.messages = [...messages.value]
-    conversation.lastMessage = lastMessage
-    conversation.updatedAt = new Date().toISOString()
+const refreshConversations = async () => {
+  try {
+    const apiConversations = await chatAPI.getConversations()
     
-    // 如果是第一条消息，更新对话标题
-    if (conversation.messages.length === 1 && conversation.title === '新对话') {
-      conversation.title = lastMessage.substring(0, 20) + (lastMessage.length > 20 ? '...' : '')
-    }
-    
-    // 将当前对话移到顶部
-    conversations.value = conversations.value.filter(c => c.id !== currentConversationId.value)
-    conversations.value.unshift(conversation)
-    
-    saveConversations()
+    conversations.value = apiConversations.map(conv => ({
+      id: conv.conversationId,
+      lastMessage: conv.lastMessage || '暂无消息',
+      updatedAt: conv.lastMessageTime
+    }))
+  } catch (error) {
+    console.error('刷新对话列表失败:', error)
   }
 }
 
+const thinkingSteps = ref([])
+
 const generateAIResponse = async (userInput) => {
   try {
-    const response = await chatAPI.sendMessage(userInput, {
+    thinkingSteps.value = []
+    
+    const stream = await chatAPI.sendMessage(userInput, {
       chatId: currentConversationId.value || 'default',
       enableRAG: enableRAG.value,
       enableTools: enableTools.value,
       enableThinking: enableThinking.value
     })
     
-    // 处理SSE流式响应
-    const reader = response.body.getReader()
+    const reader = stream.getReader()
     const decoder = new TextDecoder()
+    let buffer = ""
     let fullResponse = ''
+    let aiMessageIndex = -1
+    
+    const aiMessage = {
+      text: '',
+      sender: 'ai',
+      time: new Date(),
+      thinkingSteps: [],
+      isComplete: false
+    }
+    messages.value.push(aiMessage)
+    aiMessageIndex = messages.value.length - 1
     
     while (true) {
       const { done, value } = await reader.read()
-      if (done) break
       
-      const chunk = decoder.decode(value)
-      const lines = chunk.split('\n')
+      if (done) {
+        if (buffer.length > 0) {
+          processSseLine(buffer, aiMessageIndex, fullResponse)
+        }
+        if (aiMessageIndex >= 0) {
+          messages.value[aiMessageIndex].isComplete = true
+          await nextTick()
+          if (typeof hljs !== 'undefined') {
+            document.querySelectorAll('pre code').forEach((block) => {
+              hljs.highlightElement(block)
+            })
+          }
+        }
+        if (currentConversationId.value) {
+          await loadConversationMessages(currentConversationId.value)
+        }
+        break
+      }
+      
+      const text = decoder.decode(value, { stream: true })
+      buffer += text
+      
+      const lines = buffer.split('\n')
+      buffer = lines.pop() || ""
       
       for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const data = line.substring(6)
-          if (data === '[DONE]') {
-            return fullResponse
-          }
-          fullResponse += data
-          // 可以在这里实时更新UI显示
-        }
+        fullResponse = processSseLine(line, aiMessageIndex, fullResponse)
       }
     }
     
     return fullResponse
   } catch (error) {
     console.error('AI回复失败:', error)
+    
+    const errorMessage = {
+      text: '抱歉，我无法处理您的请求。请稍后再试。',
+      sender: 'ai',
+      time: new Date(),
+      isError: true,
+      isComplete: true
+    }
+    messages.value.push(errorMessage)
+    
+    await nextTick()
+    smartScroll()
+    
     return '抱歉，我无法处理您的请求。请稍后再试。'
   }
+}
+
+const processSseLine = (line, aiMessageIndex, fullResponse) => {
+  if (!line.trim()) return fullResponse
+
+  if (line.startsWith('event:')) {
+    return fullResponse
+  }
+
+  if (line.startsWith('data:')) {
+    const data = line.slice(5).trim()
+
+    if (data === '[DONE]' || !data) {
+      return fullResponse
+    }
+
+    if (data.startsWith('thinking:')) {
+      const step = data.substring(9).trim()
+      thinkingSteps.value.push(step)
+      if (aiMessageIndex >= 0) {
+        messages.value[aiMessageIndex].thinkingSteps = [...thinkingSteps.value]
+      }
+    } else if (data.startsWith('error:')) {
+      const errorMsg = data.substring(6).trim()
+      throw new Error(errorMsg)
+    } else {
+      fullResponse += data
+      if (aiMessageIndex >= 0) {
+        messages.value[aiMessageIndex].text = fullResponse
+        smartScroll()
+        throttledHighlight()
+      }
+    }
+  }
+
+  return fullResponse
+}
+
+const smartScroll = () => {
+  nextTick(() => {
+    if (messagesContainer.value) {
+      const container = messagesContainer.value
+      const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100
+      
+      if (isNearBottom) {
+        scrollToBottom()
+      }
+    }
+  })
 }
 
 const formatTime = (date) => {
@@ -439,30 +564,60 @@ const scrollToBottom = () => {
   }
 }
 
-onMounted(() => {
-  initializeConversations()
+onMounted(async () => {
+  await initializeConversations()
   scrollToBottom()
 })
 </script>
 
 <style scoped>
 .chat-window {
-  padding: 0;
+  padding: 24px;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   border-radius: 20px;
   min-height: calc(100vh - 48px);
   color: #ffffff;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-header p {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.content-area {
+  display: flex;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
 }
 
 .sidebar {
   width: 320px;
+  height: 600px;
   background: rgba(100, 100, 100, 0.3);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   padding: 24px 0;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .sidebar-header {
@@ -503,10 +658,12 @@ onMounted(() => {
 .conversation-list {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 0 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  scroll-behavior: smooth;
 }
 
 .conversation-item {
@@ -592,32 +749,13 @@ onMounted(() => {
 
 .main-content {
   flex: 1;
-  padding: 40px;
   display: flex;
   flex-direction: column;
-}
-
-.page-header {
-  margin-bottom: 24px;
-}
-
-.page-header h1 {
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.page-header p {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.7);
+  min-height: 0;
 }
 
 .chat-container {
-  flex: 1;
+  height: 600px;
   display: flex;
   flex-direction: column;
   background: rgba(255, 255, 255, 0.05);
@@ -633,7 +771,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-height: calc(100vh - 300px);
+  min-height: 0;
 }
 
 .message {
@@ -692,7 +830,89 @@ onMounted(() => {
   margin: 0 0 8px 0;
   line-height: 1.5;
   font-size: 15px;
-  white-space: pre-wrap;
+}
+
+.thinking-process {
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.thinking-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.thinking-icon {
+  font-size: 16px;
+  animation: pulse 2s infinite ease-in-out;
+}
+
+.thinking-title {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.thinking-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.thinking-step {
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid rgba(102, 126, 234, 0.6);
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+.message-text-container {
+  position: relative;
+}
+
+.message-text {
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.5;
+  font-size: 15px;
+  word-wrap: break-word;
+}
+
+.message-text.markdown-body {
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.7;
+}
+
+.error-message {
+  background: rgba(239, 68, 68, 0.1) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+.error-message .message-content {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.error-message .message-text {
+  color: #fca5a5;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .message-time {
@@ -837,7 +1057,6 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
-/* 滚动条样式 */
 .chat-messages::-webkit-scrollbar,
 .conversation-list::-webkit-scrollbar {
   width: 6px;
@@ -851,31 +1070,51 @@ onMounted(() => {
 
 .chat-messages::-webkit-scrollbar-thumb,
 .conversation-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 3px;
+  transition: background 0.2s ease;
 }
 
 .chat-messages::-webkit-scrollbar-thumb:hover,
 .conversation-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.chat-messages,
+.conversation-list {
+  scroll-behavior: smooth;
 }
 
 @media (max-width: 768px) {
   .chat-window {
+    padding: 16px;
+  }
+  
+  .page-header {
+    margin-bottom: 16px;
+  }
+  
+  .page-header h1 {
+    font-size: 24px;
+  }
+  
+  .page-header p {
+    font-size: 14px;
+  }
+  
+  .content-area {
     flex-direction: column;
+    gap: 16px;
   }
   
   .sidebar {
     width: 100%;
-    height: auto;
-    max-height: 200px;
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    height: 300px;
     padding: 16px 0;
   }
   
   .main-content {
-    padding: 16px;
+    flex: 1;
   }
   
   .message {
@@ -966,5 +1205,127 @@ onMounted(() => {
 .confirm-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+</style>
+
+<style>
+.markdown-body {
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.7;
+  word-wrap: break-word;
+}
+
+.markdown-body p {
+  margin: 0 0 12px 0;
+}
+
+.markdown-body p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body h1, .markdown-body h2, .markdown-body h3,
+.markdown-body h4, .markdown-body h5, .markdown-body h6 {
+  margin: 16px 0 8px 0;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.markdown-body h1 { font-size: 1.4em; }
+.markdown-body h2 { font-size: 1.25em; }
+.markdown-body h3 { font-size: 1.1em; }
+
+.markdown-body ul, .markdown-body ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.markdown-body li {
+  margin: 4px 0;
+}
+
+.markdown-body blockquote {
+  margin: 8px 0;
+  padding: 8px 16px;
+  border-left: 4px solid rgba(102, 126, 234, 0.6);
+  background: rgba(102, 126, 234, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.markdown-body code {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  background: rgba(255, 255, 255, 0.1);
+  color: #e2b86b;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+}
+
+.markdown-body pre {
+  margin: 12px 0;
+  border-radius: 8px;
+  overflow-x: auto;
+  position: relative;
+}
+
+.markdown-body pre code {
+  display: block;
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.85em;
+  line-height: 1.6;
+}
+
+.markdown-body pre.hljs {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  margin: 12px 0;
+}
+
+.markdown-body pre.hljs code {
+  background: transparent;
+}
+
+.markdown-body table {
+  border-collapse: collapse;
+  margin: 12px 0;
+  width: 100%;
+}
+
+.markdown-body th, .markdown-body td {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.markdown-body th {
+  background: rgba(255, 255, 255, 0.1);
+  font-weight: 600;
+}
+
+.markdown-body a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.markdown-body a:hover {
+  text-decoration: underline;
+}
+
+.markdown-body hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 16px 0;
+}
+
+.markdown-body strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.markdown-body em {
+  color: rgba(255, 255, 255, 0.85);
 }
 </style>
