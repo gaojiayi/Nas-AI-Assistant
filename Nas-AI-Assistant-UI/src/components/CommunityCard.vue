@@ -200,22 +200,22 @@ const handlePlay = () => {
 }
 
 .card-content {
-  padding: 12px;
+  padding: 16px;
   flex: 1;
 }
 
 .card-content h3 {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
   color: #ffffff;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .card-content p {
   color: rgba(255, 255, 255, 0.7);
-  line-height: 1.3;
-  font-size: 11px;
-  margin-bottom: 8px;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  font-size: 13px;
 }
 
 .card-stats {

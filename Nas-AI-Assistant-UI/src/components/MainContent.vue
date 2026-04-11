@@ -79,14 +79,14 @@ import FeatureCard from './FeatureCard.vue'
 .main-content {
   height: 100vh;
   overflow-y: auto;
-  padding: 16px;
+  padding: 12px;
 }
 
 .banner {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 20px;
-  padding: 30px 40px;
-  margin-bottom: 48px;
+  padding: 24px 32px;
+  margin-bottom: 24px;
   position: relative;
   overflow: hidden;
 }
@@ -95,19 +95,19 @@ import FeatureCard from './FeatureCard.vue'
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   width: 100%;
-  gap: 40px;
+  gap: 24px;
 }
 
 .banner-content h1 {
-  font-size: 42px;
+  font-size: 32px;
   font-weight: 900;
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   text-transform: uppercase;
   font-family: 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
 }
@@ -115,29 +115,29 @@ import FeatureCard from './FeatureCard.vue'
 .banner-images {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
   z-index: 10;
-  margin-left: 20px;
+  margin-left: 12px;
 }
 
 .banner-image {
   object-fit: contain;
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
-  max-height: 120px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  max-height: 80px;
 }
 
 .devices-image {
-  width: 120px;
+  width: 80px;
   opacity: 0.9;
 }
 
 .circuit-image {
-  width: 140px;
+  width: 90px;
   opacity: 0.9;
 }
 
 .nas-image {
-  width: 160px;
+  width: 100px;
   opacity: 0.95;
 }
 
@@ -188,22 +188,22 @@ import FeatureCard from './FeatureCard.vue'
 }
 
 .dynamic-content {
-  margin-bottom: 48px;
+  margin-bottom: 24px;
 }
 
 .content-section {
-  margin-bottom: 48px;
+  margin-bottom: 24px;
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .section-header h2 {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 600;
   color: #ffffff;
 }
@@ -221,8 +221,8 @@ import FeatureCard from './FeatureCard.vue'
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
 }
 
 @media (max-width: 768px) {

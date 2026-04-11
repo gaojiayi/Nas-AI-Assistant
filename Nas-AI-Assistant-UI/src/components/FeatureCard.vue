@@ -59,7 +59,7 @@ const adjustColor = (color, amount) => {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8b5cf6 100%);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 16px;
-  padding: 28px;
+  padding: 20px;
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
@@ -68,36 +68,36 @@ const adjustColor = (color, amount) => {
 
 .feature-card:hover {
   background: transparent;
-  transform: translateY(-12px);
+  transform: translateY(-8px);
   border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
 }
 
 
 .card-icon {
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
+  border-radius: 12px;
   color: #ffffff;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  margin-bottom: 16px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .card-content h3 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: #ffffff;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .card-content p {
   color: rgba(255, 255, 255, 0.7);
-  line-height: 1.5;
-  margin-bottom: 20px;
-  font-size: 15px;
+  line-height: 1.4;
+  margin-bottom: 16px;
+  font-size: 13px;
 }
 
 .card-action {

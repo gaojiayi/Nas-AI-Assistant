@@ -162,7 +162,7 @@ const openVideo = () => {
 
 <style scoped>
 .community-page {
-  padding: 40px;
+  padding: 24px;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   border-radius: 20px;
   min-height: calc(100vh - 48px);
@@ -170,13 +170,13 @@ const openVideo = () => {
 }
 
 .page-header {
-  margin-bottom: 32px;
+  margin-bottom: 20px;
 }
 
 .page-header h1 {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -184,23 +184,23 @@ const openVideo = () => {
 }
 
 .page-header p {
-  font-size: 16px;
+  font-size: 14px;
   color: rgba(255, 255, 255, 0.7);
 }
 
 .content-section {
-  margin-bottom: 48px;
+  margin-bottom: 24px;
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .section-header h2 {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 600;
   color: #ffffff;
 }
@@ -221,7 +221,7 @@ const openVideo = () => {
   overflow: hidden;
   border-radius: 16px;
   width: 60%;
-  aspect-ratio: 16 / 11;
+  aspect-ratio: 16 / 9;
   margin: 0 auto;
 }
 
