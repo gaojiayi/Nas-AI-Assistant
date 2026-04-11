@@ -21,7 +21,7 @@ import jakarta.annotation.Resource;
 
 @RestController
 @RequestMapping("/ai/history")
-public class ChatHistoryChatMemory {
+public class ChatHistoryController{
 
     @Resource
     private ChatMessageRepository chatMessageRepository;

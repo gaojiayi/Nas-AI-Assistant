@@ -5,6 +5,11 @@ export const communityCardsMock = [
     title: '家庭VPN建站',
     description: 'NAS能够搭建家庭跨境路由,全设备支持跨境直播，社交互动，和产品展示，为中小商家及个体户拓展新的销售渠道。',
     image: 'tiktok'
+  },
+  {
+    title: '数据备份中心',
+    description: '智能备份解决方案，自动同步重要文件到云端，确保数据安全不丢失。',
+    image: 'backup'
   }
 ]
 

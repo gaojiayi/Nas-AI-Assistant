@@ -38,4 +38,10 @@ public class MessageVO {
      * 思考用时（秒，仅智能体应用）
      */
     private Integer thinkingTime;
+
+    public static class MessageVOBuilder {
+
+        public MessageVOBuilder() {
+        }
+    }
 }

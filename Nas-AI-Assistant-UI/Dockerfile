@@ -2,6 +2,7 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY . .
+# 确保使用生产环境配置
 RUN npm install
 RUN npm run build
 
@@ -11,6 +12,9 @@ FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 # 复制自定义 nginx 配置替换默认配置
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+# 设置正确的文件权限
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html
 # 暴露端口
 EXPOSE 5123
 # 启动 Nginx

@@ -6,8 +6,6 @@ server:
 spring:
   application:
     name: nas-ai-assistant-app
-  profiles:
-    active: cloud
   ai:
     retry:
       max-attempts: 1

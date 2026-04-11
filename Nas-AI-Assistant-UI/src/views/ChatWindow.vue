@@ -348,9 +348,7 @@ const toggleRAG = () => {
 }
 
 const toggleTools = () => {
-  const oldValue = enableTools.value
   enableTools.value = !enableTools.value
-  console.log('toggleTools called:', oldValue, '->', enableTools.value)
 }
 
 const toggleThinking = () => {
@@ -379,13 +377,17 @@ const sendMessage = async () => {
   const userInput = inputMessage.value.trim()
   inputMessage.value = ''
   
-  refreshConversations()
+  // 更新当前对话的lastMessage和updatedAt
+  const currentConversation = conversations.value.find(c => c.id === currentConversationId.value)
+  if (currentConversation) {
+    currentConversation.lastMessage = userInput
+    currentConversation.updatedAt = new Date()
+  }
   
   await nextTick()
   scrollToBottom()
   
   isTyping.value = true
-  console.log('sendMessage - enableTools:', enableTools.value, 'enableRAG:', enableRAG.value, 'enableThinking:', enableThinking.value)
   await nextTick()
   scrollToBottom()
   
@@ -405,11 +407,25 @@ const refreshConversations = async () => {
   try {
     const apiConversations = await chatAPI.getConversations()
     
+    const oldConversationId = currentConversationId.value
+    const isTempId = oldConversationId && !isNaN(oldConversationId) && oldConversationId.length > 10
+    
     conversations.value = apiConversations.map(conv => ({
       id: conv.conversationId,
       lastMessage: conv.lastMessage || '暂无消息',
       updatedAt: conv.lastMessageTime
     }))
+    
+    if (conversations.value.length > 0) {
+      if (oldConversationId && conversations.value.find(c => c.id === oldConversationId)) {
+        currentConversationId.value = oldConversationId
+      } else if (isTempId) {
+        currentConversationId.value = conversations.value[0].id
+        await loadConversationMessages(conversations.value[0].id)
+      } else {
+        currentConversationId.value = conversations.value[0].id
+      }
+    }
   } catch (error) {
     console.error('刷新对话列表失败:', error)
   }
@@ -421,7 +437,6 @@ const generateAIResponse = async (userInput) => {
   try {
     thinkingSteps.value = []
     
-    console.log('generateAIResponse - enableTools:', enableTools.value, 'enableRAG:', enableRAG.value, 'enableThinking:', enableThinking.value)
     const stream = await chatAPI.sendMessage(userInput, {
       chatId: currentConversationId.value || 'default',
       enableRAG: enableRAG.value,
@@ -461,9 +476,7 @@ const generateAIResponse = async (userInput) => {
             })
           }
         }
-        if (currentConversationId.value) {
-          await loadConversationMessages(currentConversationId.value)
-        }
+        refreshConversations()
         break
       }
       
@@ -572,7 +585,6 @@ onMounted(async () => {
   enableRAG.value = false
   enableTools.value = false
   enableThinking.value = false
-  console.log('onMounted - enableTools:', enableTools.value, 'enableRAG:', enableRAG.value, 'enableThinking:', enableThinking.value)
   await initializeConversations()
   scrollToBottom()
 })

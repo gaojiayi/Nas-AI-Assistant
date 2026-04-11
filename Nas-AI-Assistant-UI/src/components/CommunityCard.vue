@@ -1,7 +1,7 @@
 <template>
   <div class="community-card" :class="cardTypeClass" @click="handlePlay">
     <div class="card-image" :class="imageClass">
-      <div class="image-placeholder"></div>
+      <div class="image-placeholder" :style="{ backgroundImage: backgroundImageStyle }"></div>
       <div class="play-button">
         <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
           <circle cx="30" cy="30" r="28" fill="rgba(255, 255, 255, 0.9)" stroke="rgba(255, 255, 255, 0.3)" stroke-width="2"/>
@@ -45,6 +45,19 @@ const emit = defineEmits(['play'])
 const imageClass = computed(() => `image-${props.image}`)
 
 const cardTypeClass = computed(() => `card-type-${props.type}`)
+
+const backgroundImageStyle = computed(() => {
+  const imageMap = {
+    'tiktok': '/images/tiktok.png',
+    'backup': '/images/backup.png',
+    'vr': null,
+    'gaming': null,
+    'art': null,
+    'nft': null
+  }
+  const imageUrl = imageMap[props.image]
+  return imageUrl ? `url(${imageUrl})` : null
+})
 
 const formatNumber = (num) => {
   if (num >= 1000000) {
@@ -100,10 +113,11 @@ const handlePlay = () => {
 }
 
 .card-image {
-  aspect-ratio: 16 / 7.5;
+  aspect-ratio: 16 / 9;
   position: relative;
   overflow: hidden;
   width: 100%;
+  flex-shrink: 0;
 }
 
 .play-button {
@@ -114,6 +128,13 @@ const handlePlay = () => {
   opacity: 0.9;
   transition: all 0.3s ease;
   pointer-events: none;
+  width: 40px;
+  height: 40px;
+}
+
+.play-button svg {
+  width: 40px;
+  height: 40px;
 }
 
 .community-card:hover .play-button {
@@ -124,14 +145,9 @@ const handlePlay = () => {
 .image-placeholder {
   width: 100%;
   height: 100%;
-}
-
-.image-backup .image-placeholder {
-  background: url('/images/backup.png') center/cover no-repeat;
-}
-
-.image-tiktok .image-placeholder {
-  background: url('/images/tiktok.png') center/cover no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .image-vr .image-placeholder {
@@ -184,21 +200,22 @@ const handlePlay = () => {
 }
 
 .card-content {
-  padding: 20px;
+  padding: 12px;
   flex: 1;
 }
 
 .card-content h3 {
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 600;
   color: #ffffff;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .card-content p {
   color: rgba(255, 255, 255, 0.7);
-  line-height: 1.5;
-  margin-bottom: 16px;
+  line-height: 1.3;
+  font-size: 11px;
+  margin-bottom: 8px;
 }
 
 .card-stats {
