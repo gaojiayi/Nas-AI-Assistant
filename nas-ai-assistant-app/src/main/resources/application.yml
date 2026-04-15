@@ -19,7 +19,7 @@ spring:
         options:
           temperature: 0.7
     dashscope:  
-      api-key: ${DASHSCOPE_API_KEY:sk-308ebb98395b4976af5f52c782fcd6ee}
+      api-key: ${DASHSCOPE_API_KEY}
       chat:
         options:
           model: ${DASHSCOPE_MODEL:qwen3-max-2026-01-23}
